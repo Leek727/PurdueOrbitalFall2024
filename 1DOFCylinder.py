@@ -114,11 +114,11 @@ def draw_circle_with_direction(angle, firing_thrusters):
 
 # --------------------------- dynamics -----------------------------
 # cylinder properties
-mass = 1.5  # kg
+mass = 10  # kg
 r = 0.1  # m
 I = (mass * (r**2)) / 2  # kg m^2
 
-dt = .001
+dt = 1/400
 
 # state vector - [angle, angular velocity]
 x = [0, 0]
@@ -140,15 +140,18 @@ def update_state(F, state) -> list:
 def pid_controller(x, setpoint):
     """Will return duty cycle for thrusters"""
     error = setpoint - x[0]
-    kP = 10
+    kP = 1000
     kI = 0 # no friction
-    kD = .15
+    kD = 30
 
     output = kP * error - kD * x[1]
     
-    if abs(output) > 1:
-        output = 1 * (abs(output) / output)
-
+    cap = 100
+    if output > cap:
+        output = cap
+    elif output < -cap:
+        output  = -cap
+  
     return output
 
 # Main game loop
@@ -168,7 +171,7 @@ while running:
     F = 0
 
     output = pid_controller(x, 0)
-    F = 1000 * output
+    F = output
 
     if F < 0:
         firing_thrusters[2] = True
@@ -181,10 +184,10 @@ while running:
     # Handle keypresses
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
-        F = -1000
+        F = -50
 
     if keys[pygame.K_RIGHT]:
-        F = 1000
+        F = 50
 
     # Update state vector
     x = update_state(F, x)
@@ -193,7 +196,7 @@ while running:
     draw_circle_with_direction(-(x[0] * 360) / (2 * math.pi), firing_thrusters)
 
     # Limit frame rate
-    clock.tick(60)
+    clock.tick(400)
 
 # Quit Pygame
 pygame.quit()
