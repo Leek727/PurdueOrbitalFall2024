@@ -3,12 +3,10 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.animation import FuncAnimation
 import numpy as np
-from numpy import cos, sin
-from numpy.linalg import inv
 from scipy.spatial.transform import Rotation as R
 from scipy.integrate import RK45
 import matplotlib.pyplot as plt
-
+from util import *
 
 # Create a figure and a 3D axis
 fig = plt.figure()
@@ -32,36 +30,10 @@ line, = ax.plot([], [], [], lw=2)
 
 rotation = [np.pi/100,np.pi/100,0]
 
-# skin friction coefficient
-Cf = 1 / (1.5 * np.log())
 
-def body2Inertial(rotation, x):
-    """Rotate vector x to inertial frame given rotation"""
-    psi, theta, phi = rotation
-    rotation_mat = np.array(
-        [
-            [cos(psi)*cos(theta), cos(theta)*sin(psi), -sin(theta)],
-            [cos(psi)*sin(phi)*sin(theta)-cos(phi)*sin(psi), cos(phi)*cos(psi)+sin(phi)*sin(psi)*sin(theta), cos(theta)*sin(phi)],
-            [sin(phi)*sin(psi)+cos(phi)*cos(psi)*sin(theta), cos(phi)*sin(psi)*sin(theta)-cos(psi)*sin(phi), cos(phi)*cos(theta)]
-        ]
-    )
 
-    return np.matmul(rotation_mat,x)
+#print(getSkinCF(R, L, Rs))
 
-def inertial2Body(rotation, x):
-    """Given angle of rocket and force in world reference frame, rotate force into body reference frame"""
-    # inverse of body2Inertial mat
-    psi, theta, phi = rotation  
-    world_mat = np.array(
-        [
-            [cos(psi)*cos(theta), cos(theta)*sin(psi), -sin(theta)],
-            [cos(psi)*sin(phi)*sin(theta)-cos(phi)*sin(psi), cos(phi)*cos(psi)+sin(phi)*sin(psi)*sin(theta), cos(theta)*sin(phi)],
-            [sin(phi)*sin(psi)+cos(phi)*cos(psi)*sin(theta), cos(phi)*sin(psi)*sin(theta)-cos(psi)*sin(phi), cos(phi)*cos(theta)]
-        ]
-    )
-    body_mat = inv(world_mat)
-
-    return np.matmul(body_mat, x)
 
 def state_space(t, position):
     v = position[0:3]
@@ -125,11 +97,11 @@ velocity = np.array([0.0,0.0,0.0])
 
 
 #print(func(0,np.append(position, rotation)))
-sol = RK45(state_space, t0=0, y0=np.append(velocity, position), t_bound=1000)
+sol = RK45(state_space, t0=0, y0=np.append(velocity, position), t_bound=1000, max_step=1)
 
 t = []
 pos = []
-for i in range(100):
+while True:
     sol.step()
     t.append(sol.t)
     pos.append(sol.y[3:6])
