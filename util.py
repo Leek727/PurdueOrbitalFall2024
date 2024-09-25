@@ -2,9 +2,10 @@ import numpy as np
 from numpy import cos, sin
 from constants import *
 from numpy.linalg import inv
+from scipy.spatial.transform import Rotation
 
 # utility functions
-def getSkinCF(R: float, v: float) -> float:
+def getSkinCd(R: float, v: float) -> float:
     """Reynolds num, abs velocity of rocket -> skin friction drag coefficient"""
     characteristic_len = 2*radius 
     R_crit = 51 * (Rs / characteristic_len) ** (-1.039)
@@ -31,9 +32,26 @@ def getSkinCF(R: float, v: float) -> float:
 
     # get actual drag coefficient
     fB = body_length / diameter  # fineness ratio / how slim it is
-    Cd = Cf * ((1 + 1 / (2 * fB) * A_wet_body + (1 + (2 * fin_thickness) / mean_chord_len) * A_wet_fins)) / A_ref
+    Cd = Cf * ((1 + 1 / (2 * fB) * A_wet_body + (1 + (2 * fin_thickness) / mean_chord_len) * A_wet_fins)) / (A_wet_fins + A_wet_body)
 
     return Cd
+
+def getNoseCd(v: float) -> float:
+    """Takes rocket velocity v, outputs nose pressure drag cd"""
+    # openrocket 3.86
+    mach = v/343
+    Cd = 0.8 * (np.sin(nose_angle)**2)
+    if mach <= .8:
+        return Cd
+
+    return -1 # TODO  
+
+# scalar last - i,j,k,scalar
+def axis_angle_to_quat(v, angle):
+    """axis angle rep to quat"""
+    v = v / np.linalg.norm(v) # get unit vec
+    v *= np.cos(angle/2)
+    return Rotation.from_quat(np.append(v, [np.sin(angle/2)]))
 
 
 def body2Inertial(rotation, x):

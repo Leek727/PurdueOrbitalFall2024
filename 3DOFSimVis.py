@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.animation import FuncAnimation
 import numpy as np
-from scipy.spatial.transform import Rotation as R
+from scipy.spatial.transform import Rotation
 from scipy.integrate import RK45
 import matplotlib.pyplot as plt
 from util import *
@@ -28,9 +28,8 @@ line, = ax.plot([], [], [], lw=2)
 # p theta
 # r phi
 
-rotation = [np.pi/100,np.pi/100,0]
-
-
+# initial rotation of rocket body
+rotation = axis_angle_to_quat([1,.2,0], np.pi/2)
 
 #print(getSkinCF(R, L, Rs))
 
@@ -44,25 +43,18 @@ def state_space(t, position):
     # ay = Gy
     # az = Gz
     position = np.array(position)
-    net_force_body = np.zeros(3)
-
-    # rotate gravity to body frame
-    # unit vec from center to position of rocket
-    #u = position / np.sqrt(position.dot(position))
-    #G = g * (-u)
-    #G_body = inertial2Body(rotation,)
-    #print(G_body)
-    #net_force_body += G_body
+    body_acc = np.zeros(3)
 
     # add thrust
     thrust = 500/m
     if t > 50:
         thrust = 0
     
-    net_force_body += np.array([thrust,0,0])
+    body_acc += np.array([thrust,0,0])
 
     # rotate acceleration to world inertial frame
-    world_acc = body2Inertial(rotation, net_force_body)
+    #world_acc = body2Inertial(rotation, net_force_body)
+    world_acc = rotation.apply(body_acc)
     world_acc += np.array([-g,0,0]) # gravity
 
     # check ground collision
@@ -85,7 +77,7 @@ dt = .0001
 
 
 # ECI frame
-# z is north pole
+# x is up
 #           x,y,z
 position = np.array([1.0,0.0,0.0])
 velocity = np.array([0.0,0.0,0.0])
