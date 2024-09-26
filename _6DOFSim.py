@@ -26,7 +26,7 @@ m = 10
 #position = np.array([0,0,0,  1.0,0.0,0.0])
 #velocity = np.array([0,0,0, 0.0,0.0,0.0])
 # init quat rotation to one
-q1,q2,q3,q4 = axis_angle_to_quat([1, 0.1, 0], 0).as_quat()
+q1,q2,q3,q4 = axis_angle_to_quat([1, 0, 0], 0).as_quat()
 state = np.array([0,0,0,  0,0,0,  q1,q2,q3,q4,  0,0,0])
 
 # new state
@@ -74,9 +74,9 @@ def state_space(t, state):
 
     # ----------------------------- rotation -----------------------------------
     # [w1, w2, w3,    vx,vy,vz, phi1,phi2,phi3, x,y,z]
-    # eulers equations of motion
+    # eulers equations of motion with no external forces
     dw1 = ((I2 - I3) * w2 * w3) / I1
-    dw2 = ((I3-I1) * w3 * w1) / I1
+    dw2 = ((I3-I1) * w3 * w1) / I2
     dw3 = ((I1-I2) * w1 * w2) / I3
     
     qdot = qderiv_from_angular(dw1, dw2, dw3, np.array([q1,q2,q3,q4]))
