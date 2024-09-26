@@ -5,6 +5,8 @@ from numpy.linalg import inv
 from scipy.spatial.transform import Rotation
 
 # utility functions
+
+# ------------------------- aero -----------------------------
 def getSkinCd(R: float, v: float) -> float:
     """Reynolds num, abs velocity of rocket -> skin friction drag coefficient"""
     characteristic_len = 2*radius 
@@ -46,6 +48,8 @@ def getNoseCd(v: float) -> float:
 
     return -1 # TODO  
 
+
+# ------------------------- rotation  -----------------------------
 # scalar last - i,j,k,scalar
 def axis_angle_to_quat(v, angle):
     """axis angle rep to quat"""
