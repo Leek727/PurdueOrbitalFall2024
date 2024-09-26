@@ -28,59 +28,9 @@ rotation_speed = 2  # Speed of rotation in degrees
 thruster_length = 30
 
 
-def draw_thruster(angle, offset_angle, firing):
-    """Draws a single thruster at a specified angle offset from the direction"""
-    angle_rad = math.radians(angle + offset_angle)
-
-    # Position of the thruster on the circle's edge
-    thruster_start_x = circle_pos[0] + circle_radius * math.cos(angle_rad)
-    thruster_start_y = circle_pos[1] - circle_radius * math.sin(angle_rad)
-
-    # End of the thruster vector, indicating thrust direction
-    thruster_end_x = thruster_start_x + thruster_length * math.cos(
-        angle_rad + math.pi / 2
-    )
-    thruster_end_y = thruster_start_y - thruster_length * math.sin(
-        angle_rad + math.pi / 2
-    )
-
-    if firing:
-        pygame.draw.line(
-            screen,
-            (200,200,255),
-            (thruster_start_x, thruster_start_y),
-            (thruster_end_x, thruster_end_y),
-            4,
-        )
-
-def draw_thruster2(angle, offset_angle, firing):
-    """Draws a single thruster going in the other direction"""
-    angle_rad = math.radians(angle + offset_angle)
-
-    # Position of the thruster on the circle's edge
-    thruster_start_x = circle_pos[0] + circle_radius * math.cos(angle_rad)
-    thruster_start_y = circle_pos[1] - circle_radius * math.sin(angle_rad)
-
-    # End of the thruster vector, indicating thrust direction
-    thruster_end_x = thruster_start_x - thruster_length * math.cos(
-        angle_rad + math.pi / 2
-    )
-    thruster_end_y = thruster_start_y + thruster_length * math.sin(
-        angle_rad + math.pi / 2
-    )
-
-    if firing:
-        pygame.draw.line(
-            screen,
-            (200,200,255),
-            (thruster_start_x, thruster_start_y),
-            (thruster_end_x, thruster_end_y),
-            4,
-        )
-
 
 # Function to draw the circle, direction line, and thrusters
-def draw_circle_with_direction(angle, firing_thrusters):
+def draw_circle_with_direction(angle):
     screen.fill(BLACK)  # Clear the screen
 
     # Draw the circle
@@ -94,20 +44,6 @@ def draw_circle_with_direction(angle, firing_thrusters):
 
     # Draw the direction line
     pygame.draw.line(screen, RED, circle_pos, (line_end_x, line_end_y), 4)
-
-    # Draw the four thrusters with correct firing state
-    draw_thruster(
-        angle, 45, firing_thrusters[0]
-    )  # Top-right thruster (clockwise rotation)
-    draw_thruster(
-        angle, 225, firing_thrusters[1]
-    )  # Bottom-left thruster (clockwise rotation)
-    draw_thruster2(
-        angle, 135, firing_thrusters[2]
-    )  # Top-left thruster (counterclockwise rotation)
-    draw_thruster2(
-        angle, 315, firing_thrusters[3]
-    )  # Bottom-right thruster (counterclockwise rotation)
 
     pygame.display.flip()  # Update the display
 
@@ -161,8 +97,6 @@ clock = pygame.time.Clock()
 i = 0
 while running:
     i += 1
-    firing_thrusters = [False, False, False, False]  # Reset thruster firing states
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -173,12 +107,6 @@ while running:
     output = pid_controller(x, 0)
     F = output
 
-    if F < 0:
-        firing_thrusters[2] = True
-        firing_thrusters[3] = True
-    if F > 0:
-        firing_thrusters[0] = True 
-        firing_thrusters[1] = True
     
     
     # Handle keypresses
@@ -193,7 +121,7 @@ while running:
     x = update_state(F, x)
 
     # update screen
-    draw_circle_with_direction(-(x[0] * 360) / (2 * math.pi), firing_thrusters)
+    draw_circle_with_direction(-(x[0] * 360) / (2 * math.pi))
 
     # Limit frame rate
     clock.tick(400)
