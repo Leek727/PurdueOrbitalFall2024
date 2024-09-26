@@ -38,6 +38,7 @@ state = np.array([0,0,0,  0,0,0,  q1,q2,q3,q4,  0,0,0])
 
 def qderiv_from_angular(wx, wy, wz, q):
     """takes w1,w2,w3 -> quaternion derivative"""
+    # https://www.ashwinnarayan.com/post/how-to-integrate-quaternions/
     Omega = np.array([
         [0, -wx,-wy,-wz],
         [wx, 0, wz, -wy],
@@ -45,7 +46,10 @@ def qderiv_from_angular(wx, wy, wz, q):
         [wz, wy, -wx, 0]
     ])
 
-    return .5 * np.matmul(Omega, q)
+    # quaternion currently in scalar last rep, needs to be in scalar first
+    q = np.array([q[3], q[0], q[1], q[2]])
+
+    return .5 * Omega @ q
 
 
 def state_space(t, state):
@@ -78,6 +82,10 @@ def state_space(t, state):
     dw1 = ((I2 - I3) * w2 * w3) / I1
     dw2 = ((I3-I1) * w3 * w1) / I2
     dw3 = ((I1-I2) * w1 * w2) / I3
+
+    #if t < 10:
+    #    dw2 = .3 # angular acceleration about y axis
+
     
     qdot = qderiv_from_angular(dw1, dw2, dw3, np.array([q1,q2,q3,q4]))
 
