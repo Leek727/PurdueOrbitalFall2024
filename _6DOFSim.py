@@ -26,7 +26,7 @@ m = 10
 #position = np.array([0,0,0,  1.0,0.0,0.0])
 #velocity = np.array([0,0,0, 0.0,0.0,0.0])
 # init quat rotation to one
-q1,q2,q3,q4 = axis_angle_to_quat([1, 0, 0], 0).as_quat()
+q1,q2,q3,q4 = axis_angle_to_quat([1, .3, 0], 0).as_quat()
 state = np.array([0,0,0,  0,0,0,  q1,q2,q3,q4,  0,0,0])
 
 # new state
@@ -49,7 +49,10 @@ def qderiv_from_angular(wx, wy, wz, q):
     # quaternion currently in scalar last rep, needs to be in scalar first
     q = np.array([q[3], q[0], q[1], q[2]])
 
-    return .5 * Omega @ q
+    qr = .5 * Omega @ q
+
+    # change to scalar last representation
+    return np.array([qr[1],qr[2],qr[3],qr[0]])
 
 
 def state_space(t, state):
@@ -62,8 +65,8 @@ def state_space(t, state):
     body_acc = np.zeros(3)
 
     # add thrust
-    thrust = 500/m
-    if t > 50:
+    thrust = 1000/m
+    if t > 20:
         thrust = 0
 
     body_acc += np.array([thrust,0,0])
@@ -83,10 +86,9 @@ def state_space(t, state):
     dw2 = ((I3-I1) * w3 * w1) / I2
     dw3 = ((I1-I2) * w1 * w2) / I3
 
-    #if t < 10:
-    #    dw2 = .3 # angular acceleration about y axis
+    #if t < 100 and t > 50:
+    #    dw2 = .05
 
-    
     qdot = qderiv_from_angular(dw1, dw2, dw3, np.array([q1,q2,q3,q4]))
 
 
