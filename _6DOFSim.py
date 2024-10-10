@@ -26,10 +26,10 @@ m = 10
 #position = np.array([0,0,0,  1.0,0.0,0.0])
 #velocity = np.array([0,0,0, 0.0,0.0,0.0])
 # init quat rotation to one
-q1,q2,q3,q4 = axis_angle_to_quat([1, .3, 0], 0).as_quat()
+q1,q2,q3,q4 = axis_angle_to_quat([1, .1, 0], 0).as_quat()
 state = np.array([0,0,0,  0,0,0,  q1,q2,q3,q4,  0,0,0])
 
-# new state
+# state
 # [w1, w2, w3,    vx,vy,vz, q1,    q2,    q3,    q4, x,y,z]
 # state deriv
 # [dw1, dw2, dw3, ax,ay,az, q1dot, q2dot, q3dot, q4dot,     vx,vy,vz]
@@ -64,20 +64,40 @@ def state_space(t, state):
     # gravity rotated to body frame
     body_acc = np.zeros(3)
 
+
+    if x < 0:
+        return np.zeros((13))
+
+    # drag stuff
+    velocity_vec = np.array([vx,vy,vz])
+    abs_vel = np.sqrt(velocity_vec.dot(velocity_vec))
+    if abs_vel != 0:
+        velocity_normal = velocity_vec / abs_vel
+        alt = x
+        if alt > 39619:
+            alt = 39619
+
+        skin_drag_force = getSkinDrag(v=abs_vel, alt=int(alt))
+        #skin_drag_force = abs_vel/10
+        #print(abs_vel)
+        #print(f"Drag force: {skin_drag_force}")
+        #print(f"Velocity {velocity_vec}")
+        drag = (-velocity_normal * skin_drag_force)/m # force opposes direction of motion
+        #print(drag)
+
+        body_acc += np.array(drag)
+
+
     # add thrust
-    thrust = 1000/m
-    if t > 20:
-        thrust = 0
+    thrust = 200/m
+    #if t > 20:
+    #    thrust = 0
 
     body_acc += np.array([thrust,0,0])
+
     world_acc = rotation.apply(body_acc)
     world_acc += np.array([-9.8, 0, 0])
 
-    if x < 0:
-        vx = 0
-        vy = 0 
-        vz = 0
-        world_acc = np.array([0,0,0])
 
     # ----------------------------- rotation -----------------------------------
     # [w1, w2, w3,    vx,vy,vz, phi1,phi2,phi3, x,y,z]
@@ -86,8 +106,6 @@ def state_space(t, state):
     dw2 = ((I3-I1) * w3 * w1) / I2
     dw3 = ((I1-I2) * w1 * w2) / I3
 
-    #if t < 100 and t > 50:
-    #    dw2 = .05
 
     qdot = qderiv_from_angular(dw1, dw2, dw3, np.array([q1,q2,q3,q4]))
 
@@ -106,7 +124,7 @@ def state_space(t, state):
 
 
 #print(func(0,np.append(position, rotation)))
-sol = RK45(state_space, t0=0, y0=state, t_bound=10000, max_step=1)
+sol = RK45(state_space, t0=0, y0=state, t_bound=300, max_step=1)
 
 t = []
 pos = []
@@ -119,5 +137,3 @@ while True:
 
     if sol.status == "finished":
         break
-
-print(pos[-1])
