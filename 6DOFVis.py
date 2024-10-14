@@ -34,7 +34,6 @@ def update(num):
     y_data.append(pos[num][2])
     z_data.append(pos[num][0])
 
-    
 
     # Update the line with new data
     line.set_data(x_data, y_data)

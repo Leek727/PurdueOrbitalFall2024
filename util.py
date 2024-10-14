@@ -33,13 +33,17 @@ def getSkinDrag(v: float, alt: int) -> float:
     Re = getReynolds(v, alt)
     temp, pressure, density_rho, speed_sound = ISA_data(alt)
     R_crit = 51 * (Rs / body_length) ** (-1.039)
-
+    
     # skin friction coefficient for turbulent flow
-    Cf = 1.48 * 10 ** (-2)
-    if Re > 10**4 and Re < R_crit:
+    if Re < 10 **4:
+        Cf = 1.48 * 10 ** (-2)
+        #print("low reynolds")
+    elif Re > 10**4 and Re < R_crit:
+        #print("normal")
         Cf = 1 / ((1.5 * np.log(Re) - 5.6) ** 2)
 
     elif Re >= R_crit:
+        #print("critical")
         Cf = 0.032 * ((Rs / body_length) ** 0.2)
 
 
@@ -142,4 +146,5 @@ def inertial2Body(rotation, x):
     return np.matmul(body_mat, x)
 
 if __name__ == "__main__":
-    print(getSkinDrag(100,1000))
+    for i in range(1000):
+        print(getSkinDrag(i,i*39))

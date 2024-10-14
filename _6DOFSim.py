@@ -78,12 +78,14 @@ def state_space(t, state):
             alt = 39619
 
         skin_drag_force = getSkinDrag(v=abs_vel, alt=int(alt))
+        #print(abs_vel, alt)
         #skin_drag_force = abs_vel/10
         #print(abs_vel)
         #print(f"Drag force: {skin_drag_force}")
         #print(f"Velocity {velocity_vec}")
         drag = (-velocity_normal * skin_drag_force)/m # force opposes direction of motion
-        #print(drag)
+        #print(skin_drag_force)
+        #print(abs_vel)
 
         body_acc += np.array(drag)
 
