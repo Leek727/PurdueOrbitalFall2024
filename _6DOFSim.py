@@ -91,9 +91,9 @@ def state_space(t, state):
 
 
     # add thrust
-    thrust = 200/m
-    #if t > 20:
-    #    thrust = 0
+    thrust = 5000/m
+    if t > 10:
+        thrust = 0
 
     body_acc += np.array([thrust,0,0])
 
