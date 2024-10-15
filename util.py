@@ -7,6 +7,7 @@ from ISA import ISA_data
 import pandas as pd
 # utility functions
 
+df = pd.read_csv("TheseusVars.csv")
 
 # ------------------------- aero -----------------------------
 def getReynolds(v: float, alt: int) -> float:
@@ -27,7 +28,6 @@ def getReynolds(v: float, alt: int) -> float:
     ) / kinematic_visc
 
 def getSkinDragLookUpTable(time_step: float) -> float:
-    df = pd.read_csv("TheseusVars.csv")
     t = list(df["# Time (s)"])
     dragForce = df["Drag force (N)"]
     if time_step > t[-1]:
