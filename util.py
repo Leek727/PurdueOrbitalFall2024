@@ -29,7 +29,11 @@ def getReynolds(v: float, alt: int) -> float:
 def getSkinDragLookUpTable(time_step: float) -> float:
     df = pd.read_csv("TheseusVars.csv")
     dragForce = df["Drag force (N)"]
-    return dragForce[time_step]
+    drag = dragForce[time_step]
+    if np.isnan(drag):
+        return 0
+    
+    return drag
 
 
 def getSkinDragOLD(v: float, alt: int) -> float:
@@ -152,4 +156,4 @@ def inertial2Body(rotation, x):
 
 if __name__ == "__main__":
     for i in range(1000):
-        print(getSkinDragOLD(i,i*39))
+        print(getSkinDragLookUpTable(i))

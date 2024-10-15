@@ -5,7 +5,7 @@ from scipy.spatial.transform import Rotation
 from scipy.integrate import RK45
 import matplotlib.pyplot as plt
 from util import *
-from constants import getThrust
+from constants import *
 
 """
 Initializations
@@ -58,6 +58,7 @@ def qderiv_from_angular(wx, wy, wz, q):
 
 def state_space(t, state):
     w1, w2, w3, vx,vy,vz, q1, q2, q3, q4, x,y,z = state
+    print(state)
     rotation = Rotation.from_quat(np.array([q1,q2,q3,q4]))
     state_deriv = np.zeros(9)
 
@@ -126,7 +127,6 @@ def state_space(t, state):
     # [dw1, dw2, dw3, ax,ay,az, q1dot, q2dot, q3dot, q4dot,     vx,vy,vz]
 
     return state_deriv
-
 
 
 #print(func(0,np.append(position, rotation)))
