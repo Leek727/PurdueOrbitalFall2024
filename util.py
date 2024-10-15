@@ -28,11 +28,15 @@ def getReynolds(v: float, alt: int) -> float:
 
 def getSkinDragLookUpTable(time_step: float) -> float:
     df = pd.read_csv("TheseusVars.csv")
+    t = list(df["# Time (s)"])
     dragForce = df["Drag force (N)"]
-    drag = dragForce[time_step]
+    if time_step > t[-1]:
+        return 0
+    time_ind = np.searchsorted(t, time_step)
+    drag = dragForce[time_ind]
     if np.isnan(drag):
         return 0
-    
+    # print(drag)
     return drag
 
 

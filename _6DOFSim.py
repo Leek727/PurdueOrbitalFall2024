@@ -58,7 +58,7 @@ def qderiv_from_angular(wx, wy, wz, q):
 
 def state_space(t, state):
     w1, w2, w3, vx,vy,vz, q1, q2, q3, q4, x,y,z = state
-    print(state)
+    # print(state)
     rotation = Rotation.from_quat(np.array([q1,q2,q3,q4]))
     state_deriv = np.zeros(9)
 
@@ -87,9 +87,9 @@ def state_space(t, state):
         #print(f"Velocity {velocity_vec}")
 
         skin_drag_force = getSkinDragLookUpTable(t)
-        print(skin_drag_force)
+        # print(skin_drag_force)
         skin_drag = (-velocity_normal * skin_drag_force)/m # force opposes direction of motion
-        print(skin_drag)
+        # print(skin_drag)
 
         #print(skin_drag_force)
         #print(abs_vel)
