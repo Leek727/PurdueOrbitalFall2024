@@ -4,7 +4,7 @@ from constants import *
 from numpy.linalg import inv
 from scipy.spatial.transform import Rotation
 from ISA import ISA_data
-
+import pandas as pd
 # utility functions
 
 
@@ -26,8 +26,13 @@ def getReynolds(v: float, alt: int) -> float:
         v * body_length
     ) / kinematic_visc
 
+def getSkinDragLookUpTable(time_step: float) -> float:
+    df = pd.read_csv("TheseusVars.csv")
+    dragForce = df["Drag force (N)"]
+    return dragForce[time_step]
 
-def getSkinDrag(v: float, alt: int) -> float:
+
+def getSkinDragOLD(v: float, alt: int) -> float:
     """Abs velocity of rocket m/s, Altitude m-> skin friction drag FORCE"""
     # get reynolds
     Re = getReynolds(v, alt)
@@ -144,3 +149,7 @@ def inertial2Body(rotation, x):
     body_mat = inv(world_mat)
 
     return np.matmul(body_mat, x)
+
+if __name__ == "__main__":
+    for i in range(1000):
+        print(getSkinDragOLD(i,i*39))

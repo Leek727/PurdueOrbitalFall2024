@@ -11,7 +11,7 @@ I3 = I2
 def getThrust(t: float):  # get thrust at time in s
     time = list(df["# Time (s)"])
     thrust_arr = list(df["Thrust (N)"])
-    if t > time[-1]:
+    if t == time[-1]:
         return 0
     
     time_ind = np.searchsorted(time, t)
