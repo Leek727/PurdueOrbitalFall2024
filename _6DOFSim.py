@@ -5,6 +5,7 @@ from scipy.spatial.transform import Rotation
 from scipy.integrate import RK45
 import matplotlib.pyplot as plt
 from util import *
+from constants import getThrust
 
 """
 Initializations
@@ -91,10 +92,7 @@ def state_space(t, state):
 
 
     # add thrust
-    thrust = 5000/m
-    if t > 10:
-        thrust = 0
-
+    thrust = getThrust(t)
     body_acc += np.array([thrust,0,0])
 
     world_acc = rotation.apply(body_acc)

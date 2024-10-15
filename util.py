@@ -144,7 +144,3 @@ def inertial2Body(rotation, x):
     body_mat = inv(world_mat)
 
     return np.matmul(body_mat, x)
-
-if __name__ == "__main__":
-    for i in range(1000):
-        print(getSkinDrag(i,i*39))
